@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: rfp-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./apps/backend/credentials.env:/app/credentials.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - rfp-network
+
+  frontend:
+    build:
+      context: ./apps/frontend/react/rfp-agent
+      dockerfile: Dockerfile
+    container_name: rfp-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    networks:
+      - rfp-network
+
+networks:
+  rfp-network:
+    driver: bridge
+
+volumes:
+  rfp-data:
