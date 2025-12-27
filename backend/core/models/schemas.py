@@ -169,8 +169,93 @@ class Metadata(BaseModel):
     document_type: str
     analysis_date: str
     total_sections: int
-    file_name: str
 
 class RFPRequest(BaseModel):
     metadata: Metadata
     sections: Dict[str, SectionContent]
+    rfp_name: str
+
+# RFP Data Storage Models
+class RFPSectionData(BaseModel):
+    """Model for individual RFP section data"""
+    SectionName: str = Field(..., description="Name of the section")
+    Content: str = Field(default="", description="Content of the section")
+    Image: str = Field(default="", description="Image URL or path for the section")
+    Confidence: float = Field(default=0.0, description="Confidence score for the section", ge=0.0, le=1.0)
+
+
+class RFPAnalysisData(BaseModel):
+    """Model for individual RFP analysis result"""
+    RFP_Name: str = Field(..., description="Name of the RFP document")
+    isExported: bool = Field(default=False, description="Whether the RFP has been exported")
+    confidenceScore: float = Field(..., description="Overall confidence score for the RFP", ge=0.0, le=100.0)
+    sections: List[RFPSectionData] = Field(..., description="List of sections in the RFP")
+    createdAt: Optional[str] = Field(default=None, description="Creation timestamp")
+    updatedAt: Optional[str] = Field(default=None, description="Last update timestamp")
+    exportedAt: Optional[str] = Field(default=None, description="Export timestamp")
+    sessionId: Optional[str] = Field(default=None, description="Session ID for tracking")
+
+
+class UserRFPDataDocument(BaseModel):
+    """Model for the complete user RFP data document stored in Cosmos DB"""
+    id: str = Field(..., description="Document ID (tenant_id_user_id)")
+    Tenant_id: str = Field(..., description="Tenant/organization ID")
+    User_id: str = Field(..., description="User ID")
+    Total_RFPs: int = Field(..., description="Total number of RFPs for this user", ge=0)
+    RFP_Data: List[RFPAnalysisData] = Field(..., description="List of RFP analysis data")
+    createdAt: Optional[str] = Field(default=None, description="Document creation timestamp")
+    updatedAt: Optional[str] = Field(default=None, description="Document last update timestamp")
+
+
+class SectionUpdateData(BaseModel):
+    """Model for individual section update data"""
+    section_title: str = Field(..., description="Title of the section to update")
+    section_content: str = Field(..., description="New content for the section")
+    section_type: Optional[str] = Field(default="unknown", description="Type of the section")
+
+
+class UpdateSectionContentRequest(BaseModel):
+    """Model for updating multiple section contents in Cosmos DB"""
+    rfp_name: str = Field(..., description="Name of the RFP to update")
+    sections: List[SectionUpdateData] = Field(..., description="List of sections to update")
+
+
+class DocumentGenerationRequest(BaseModel):
+    """Simplified model for document generation - retrieves section data from Cosmos DB"""
+    rfp_name: str
+    metadata: Metadata
+
+class SectionToImport(BaseModel):
+    id: str
+    name: str
+
+class ImportSectionsRequest(BaseModel):
+    sessionId: str
+    rfpName: str
+    currentRfpName: str
+    selectedSections: List[SectionToImport]
+
+class MediaItemModel(BaseModel):
+    id: str
+    name: str
+    type: str
+    url: str
+    downloadUrl: str
+    size: str
+    source: str
+    mimeType: str
+    googleDriveFileId: str = None
+    googleDriveAccessToken: str = None
+
+class InsertToBlobRequest(BaseModel):
+    mediaItems: list[MediaItemModel]
+
+class InsertToBlobResponse(BaseModel):
+    success: bool
+    message: str = None
+
+class UploadFileFromUrlRequest(BaseModel):
+    rfp_name: str
+    url: str
+    mediaType: str
+    source: str = "manual"

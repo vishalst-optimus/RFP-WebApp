@@ -28,3 +28,8 @@ azure-ai-documentintelligence==1.0.0b4
 python-dotenv==1.0.1
 beautifulsoup4==4.12.3
 markdown==3.5.2
+Pillow==10.4.0
+PyPDF2==3.0.1
+docx2txt==0.8
+xlrd==2.0.1
+python-pptx==0.6.21

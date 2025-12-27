@@ -33,7 +33,7 @@ class MistralDocumentAIConfig(BaseModel):
     """Configuration for Mistral Document AI service"""
     endpoint: str = Field(..., description="Mistral Document AI endpoint URL")
     api_key: str = Field(..., description="Mistral Document AI API key")
-    model_name: str = Field(default="mistral-document-ai-2505", description="Model name")
+    model: str = Field(default="mistral-document-ai-2505", description="Model name")
     timeout: int = Field(default=120, description="Request timeout in seconds")
     include_image_base64: bool = Field(default=False, description="Include image base64 in response")
     

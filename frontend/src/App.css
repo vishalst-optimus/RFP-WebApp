@@ -1,0 +1,6 @@
+/* Remove default styles and use Material-UI theme instead */
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}

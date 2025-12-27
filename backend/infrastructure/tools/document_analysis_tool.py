@@ -57,7 +57,7 @@ async def analyze_document_with_mistral(file_content: bytes, file_name: str) -> 
         
         # Create API request using Pydantic model
         api_request = MistralAPIRequest(
-            model=config.model_name,
+            model=config.model,
             document=document,
             include_image_base64=config.include_image_base64
         )
